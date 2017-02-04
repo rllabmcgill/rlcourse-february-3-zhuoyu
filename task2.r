@@ -66,3 +66,33 @@ for(i in 1:200) {
 df1 <- data.frame(Variance<-c(colMeans(sample_var),colMeans(sample_var2)),Type=rep(c("Uniform Target", "Recognizer"),each=499)， Sample_Size=c(2:500, 2:500))
 library("ggplot2")
 ggplot(df1, aes(x=Sample_Size, y=Variance, group=Type, color=Type)) + geom_point()
+
+
+
+
+a <- c(2,seq(20,500, by=20))
+sample_var <- matrix(NA, nrow=200, ncol=length(a))
+
+for(i in 1:200) {
+	for (j in 1:length(a)){
+		temp <- sampling_behavior_policy(a[j])
+		x <- c(temp[(temp<0.9)&(temp>0.7)])
+		returns <- Return(x/u)
+		sample_var[i,j] <- var(returns,na.rm=TRUE)	
+	}
+}
+
+
+sample_var2 <- matrix(NA, nrow=200, ncol=length(a))
+for(i in 1:200) {
+	for (j in 1:length(a)){
+		temp <- sampling_behavior_policy(a[j])
+		x <- c(temp[(temp<0.9)&(temp>0.7)])
+		returns <- Return(x*5/(behavior_policy_density(x)))
+		sample_var2[i,j] <- var(returns,na.rm=TRUE)	
+	}
+}
+
+df1 <- data.frame(Variance<-c(colMeans(sample_var,na.rm=TRUE),colMeans(sample_var2,na.rm=TRUE)),Type=rep(c("Uniform Target", "Recognizer"),each=length(a))， Sample_Size=c(a, a))
+library("ggplot2")
+ggplot(df1, aes(x=Sample_Size, y=Variance, group=Type, color=Type)) + geom_line() + geom_point()
